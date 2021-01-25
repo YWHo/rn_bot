@@ -1,6 +1,6 @@
 # React Native bot
 
-This code is the adapt from the example code from https://blog.expo.io/so-you-want-to-build-a-chat-app-with-react-native-expo-and-microsofts-bot-framework-4d2327f76ce3 or https://github.com/watadarkstar/article-chat-bot using the latest expo and react framework.
+This code is the adaptation from the example code from https://blog.expo.io/so-you-want-to-build-a-chat-app-with-react-native-expo-and-microsofts-bot-framework-4d2327f76ce3 or https://github.com/watadarkstar/article-chat-bot using the latest expo and react framework.
 
 Note: This app will is having issue of compile failure in version '0.13.1' of 'botframework-directlinejs' (version '0.9.14' seems ok)
 
