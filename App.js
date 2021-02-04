@@ -1,6 +1,6 @@
 // import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { GiftedChat } from "react-native-gifted-chat";
 import { DirectLine } from "botframework-directlinejs";
 
@@ -13,8 +13,8 @@ const botMessageToGiftedMessage = botMessage => ({
   _id: botMessage.id,
   createdAt: botMessage.timestamp,
   user: {
-    _id: 2,
-    name: "React Native",
+    _id: botMessage.from.id,
+    name: botMessage.from.name,
     avatar:
       "https://cdn.iconscout.com/public/images/icon/free/png-512/avatar-user-business-man-399587fe24739d5a-512x512.png"
   }
@@ -27,6 +27,8 @@ function giftedMessageToBotMessage(message) {
     text: message.text
   };
 }
+
+let count = 0;
 
 export default function App() {
   const [chatMessages, setChatMessages] = React.useState([]);
@@ -44,17 +46,24 @@ export default function App() {
         },
       },
     ]);
-    directLine.activity$.subscribe(botMessage => {
-      const newMessage = botMessageToGiftedMessage(botMessage);
-      setChatMessages([newMessage, ...chatMessages]);
+    const activitySubscription = directLine.activity$.subscribe(botMessage => {
+      setChatMessages(prevMessages => {
+        const appendedMsg = GiftedChat.append(prevMessages, botMessageToGiftedMessage(botMessage));
+        return appendedMsg;
+      });
     });
-  }, [])
+
+    return () => {
+      activitySubscription.unsubscribe();
+    }
+  }, []);
 
   const onSend = React.useCallback((messages = []) => {
-    setChatMessages(previousMessages => GiftedChat.append(previousMessages, messages));
+    setChatMessages(prevMessages => GiftedChat.append(prevMessages, messages));
     messages.forEach(msg => {
+      const msgToBot = giftedMessageToBotMessage(msg);
       directLine
-        .postActivity(giftedMessageToBotMessage(msg))
+        .postActivity(msgToBot)
         .subscribe(() => console.log('success'), () => console.log('failed'));
     });
   }, [])
